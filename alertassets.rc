@@ -1,0 +1,7 @@
+ALERT_SOUND_ALARM RCDATA "assets/sounds/alarm-with-intro.wav"
+ALERT_SOUND_REMINDER RCDATA "assets/sounds/reminder-with-intro.wav"
+ALERT_SOUND_CLEAR RCDATA "assets/sounds/clear-with-intro.wav"
+ALERT_IMAGE_WARNING RCDATA "assets/images/warning.png"
+ALERT_IMAGE_CLEAR RCDATA "assets/images/clear.png"
+ALERT_TRAY_ACTIVE RCDATA "assets/icons/siren-active.ico"
+ALERT_TRAY_INACTIVE RCDATA "assets/icons/siren-inactive.ico"

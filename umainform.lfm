@@ -1,0 +1,159 @@
+object fMainForm: TfMainForm
+  Left = 798
+  Height = 218
+  Top = 375
+  Width = 464
+  BorderStyle = bsSingle
+  Caption = 'ALERT PRO v.8.0'
+  ClientHeight = 218
+  ClientWidth = 464
+  Color = 1577487
+  Font.Color = 16183271
+  Font.Height = -14
+  Font.Name = 'Segoe UI'
+  Position = poScreenCenter
+  ShowInTaskBar = stNever
+  LCLVersion = '4.8.0.0'
+  OnClose = FormClose
+  OnCreate = FormCreate
+  object TitleLabel: TLabel
+    Left = 20
+    Height = 37
+    Top = 17
+    Width = 117
+    Caption = 'Alert Pro'
+    Font.Color = 16183271
+    Font.Height = -27
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object GearButton: TButton
+    Left = 404
+    Height = 36
+    Hint = 'Меню програми'
+    Top = 17
+    Width = 40
+    Caption = '☰'
+    Font.Height = -21
+    Font.Name = 'Segoe UI Symbol'
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 0
+    OnClick = GearClick
+  end
+  object StatusSurface: TShape
+    Left = 20
+    Height = 128
+    Top = 70
+    Width = 424
+    Brush.Color = 2564120
+    Pen.Color = 4207400
+    Shape = stRoundRect
+  end
+  object Status: TLabel
+    Left = 36
+    Height = 43
+    Top = 83
+    Width = 392
+    AutoSize = False
+    Caption = 'Очікування запуску'
+    Font.Color = 16766624
+    Font.Height = -17
+    Font.Style = [fsBold]
+    ParentFont = False
+    WordWrap = True
+  end
+  object ApiLabel: TLabel
+    Left = 36
+    Height = 19
+    Top = 124
+    Width = 392
+    AutoSize = False
+    Caption = 'Очікування відповіді API'
+    Font.Color = 13024173
+    Font.Height = -12
+    ParentFont = False
+  end
+  object RegionLabel: TLabel
+    Left = 36
+    Height = 42
+    Top = 147
+    Width = 392
+    AutoSize = False
+    Caption = 'Регіон моніторингу'
+    Font.Color = 13024173
+    ParentFont = False
+    ShowAccelChar = False
+    WordWrap = True
+  end
+  object Clock: TTimer
+    Enabled = False
+    Interval = 200
+    OnTimer = Tick
+  end
+  object SettingsMenu: TPopupMenu
+    object OpenItem: TMenuItem
+      Tag = 8
+      Caption = 'Відкрити панель'
+      OnClick = CommandClick
+    end
+    object LogItem: TMenuItem
+      Tag = 9
+      Caption = 'Журнал подій'
+      OnClick = CommandClick
+    end
+    object MainSeparator: TMenuItem
+      Caption = '-'
+    end
+    object StartItem: TMenuItem
+      Tag = 1
+      Caption = 'Запустити моніторинг'
+      OnClick = CommandClick
+    end
+    object SelectItem: TMenuItem
+      Tag = 2
+      Caption = 'Вибрати регіон…'
+      OnClick = CommandClick
+    end
+    object DiagnosticItem: TMenuItem
+      Tag = 6
+      Caption = 'Перевірити АПІ'
+      OnClick = CommandClick
+    end
+    object SettingsItem: TMenuItem
+      Tag = 10
+      Caption = 'Налаштування…'
+      OnClick = CommandClick
+    end
+    object TestSeparator: TMenuItem
+      Caption = '-'
+    end
+    object AlarmItem: TMenuItem
+      Tag = 3
+      Caption = 'Тест сирени'
+      OnClick = CommandClick
+    end
+    object ReminderItem: TMenuItem
+      Tag = 4
+      Caption = 'Тест нагадування'
+      OnClick = CommandClick
+    end
+    object ClearItem: TMenuItem
+      Tag = 5
+      Caption = 'Тест відбою'
+      OnClick = CommandClick
+    end
+    object ExitSeparator: TMenuItem
+      Caption = '-'
+    end
+    object ExitItem: TMenuItem
+      Caption = 'Вихід'
+      OnClick = CommandClick
+    end
+  end
+  object TrayIcon: TTrayIcon
+    PopUpMenu = SettingsMenu
+    OnDblClick = TrayOpen
+  end
+end
