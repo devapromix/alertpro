@@ -190,6 +190,8 @@ begin
   RefreshStatus;
   TrayIcon.Visible := True;
   Clock.Enabled := True;
+  if WasUpdateInstalled then
+    Report(Format('Alert Pro оновлено до версії %s', [AlertProVersion]));
 end;
 
 destructor TfMainForm.Destroy;

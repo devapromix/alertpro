@@ -20,6 +20,7 @@ type
 function UpdateStagePath: string;
 procedure LaunchUpdateHelper;
 function RunUpdateHelper: Boolean;
+function WasUpdateInstalled: Boolean;
 procedure CleanUpdateHelper;
 
 implementation
@@ -31,6 +32,7 @@ const
   MaxUpdateBytes = 100 * 1024 * 1024;
   ApplyFlag = '--apply-update';
   CleanupFlag = '--cleanup-update';
+  FailedCleanupFlag = '--cleanup-failed-update';
 
 function CryptHashCertificate2(Algorithm: PWideChar; Flags: DWORD;
   Reserved, Data: Pointer; DataSize: DWORD; Hash: Pointer;
@@ -273,7 +275,7 @@ begin
       if not FileExistsUTF8(Target) and FileExistsUTF8(Backup) then
         MoveFileExW(PWideChar(UTF8Decode(Backup)), PWideChar(UTF8Decode(Target)), 0);
       if FileExistsUTF8(Target) then
-        StartProcess(Target, [CleanupFlag, IntToStr(PID)]);
+        StartProcess(Target, [FailedCleanupFlag, IntToStr(PID)]);
       RaiseLastOSError(ReplaceError);
     end;
     try
@@ -292,23 +294,37 @@ begin
   end;
 end;
 
-procedure CleanUpdateHelper;
-var I, Attempt: Integer;
+function UpdateCleanupBase(const Flag: string): string;
+var I: Integer;
     PID: Cardinal;
-    Base: string;
 begin
   for I := 1 to ParamCount - 1 do
-    if (ParamStr(I) = CleanupFlag) and TryStrToDWord(ParamStr(I + 1), PID) and (PID <> 0) then
-    begin
-      Base := ParamStr(0) + UpdateSuffix(PID);
-      for Attempt := 1 to 20 do
-      begin
-        if not FileExistsUTF8(Base + '-helper.exe') or DeleteFileUTF8(Base + '-helper.exe') then Break;
-        Sleep(50);
-      end;
-      DeleteFileUTF8(Base + '.backup');
-      Break;
-    end;
+    if (ParamStr(I) = Flag) and TryStrToDWord(ParamStr(I + 1), PID) and (PID <> 0) then
+      Exit(ParamStr(0) + UpdateSuffix(PID));
+  Result := '';
+end;
+
+function WasUpdateInstalled: Boolean;
+var Base: string;
+begin
+  Base := UpdateCleanupBase(CleanupFlag);
+  Result := (Base <> '') and FileExistsUTF8(Base + '.backup') and
+    not FileExistsUTF8(Base + '.download');
+end;
+
+procedure CleanUpdateHelper;
+var Attempt: Integer;
+    Base: string;
+begin
+  Base := UpdateCleanupBase(CleanupFlag);
+  if Base = '' then Base := UpdateCleanupBase(FailedCleanupFlag);
+  if Base = '' then Exit;
+  for Attempt := 1 to 20 do
+  begin
+    if not FileExistsUTF8(Base + '-helper.exe') or DeleteFileUTF8(Base + '-helper.exe') then Break;
+    Sleep(50);
+  end;
+  DeleteFileUTF8(Base + '.backup');
 end;
 
 end.
