@@ -63,6 +63,14 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="uUpdater"/>
       </Unit>
+      <Unit>
+        <Filename Value="uabout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="fAbout"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uAbout"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

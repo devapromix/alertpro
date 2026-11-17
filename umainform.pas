@@ -3,7 +3,7 @@ unit uMainForm;
 interface
 
 uses Forms, Controls, StdCtrls, ExtCtrls, Graphics, Classes, Menus, Dialogs,
-  SysUtils, Types, Windows, Registry, MMSystem, ActiveX, ComObj, Variants, fpjson, jsonparser, uEventLog, uSettings, LazFileUtils, uUpdater;
+  SysUtils, Types, Windows, Registry, MMSystem, ActiveX, ComObj, Variants, fpjson, jsonparser, uEventLog, uSettings, LazFileUtils, uUpdater, uAbout;
 
 type
   TApiJob = class(TThread)
@@ -30,7 +30,7 @@ type
     AlarmItem: TMenuItem;
     ReminderItem: TMenuItem;
     ClearItem: TMenuItem;
-    ExitSeparator: TMenuItem;
+    ExitSeparator, AboutItem: TMenuItem;
     ExitItem: TMenuItem;
     Clock: TTimer;
     procedure FormCreate(Sender: TObject);
@@ -60,11 +60,12 @@ type
     procedure ReadConfig;
     procedure ImportLegacyConfig;
     procedure EditSettings;
+    procedure ShowAbout;
     procedure SaveConfig;
     procedure SelectRegions(Data: TJSONData);
     procedure ApplyAlerts(Data: TJSONData; NowMS: QWord);
     procedure PlayAlertSound(const ResourceName: string);
-    procedure Notify(const Sound, Picture: string);
+    procedure Notify(const Sound, Picture, EventText: string);
     procedure ClearScreens;
     procedure Report(const Msg: string);
   public
@@ -165,8 +166,9 @@ begin
   IDs.Duplicates := dupIgnore;
   Screens := TList.Create;
   EventLog := TfEventLog.Create(Self);
+  EventLog.LoadHistory(Base + 'alertpro.log');
   ReadConfig;
-  Caption := 'Alert Pro ' + AlertProVersion;
+  Caption := 'Alert Pro';
   NextUpdateCheck := GetTickCount64 + 3600000;
   if (ParamCount > 0) and SameText(ParamStr(1), WindowsRunFlag) then
     if not SetPriorityClass(GetCurrentProcess, HIGH_PRIORITY_CLASS) then
@@ -473,7 +475,7 @@ begin
   end;
 end;
 
-procedure TfMainForm.Notify(const Sound, Picture: string);
+procedure TfMainForm.Notify(const Sound, Picture, EventText: string);
 var
   I: Integer;
   W: TForm;
@@ -482,6 +484,7 @@ var
   Stream: TResourceStream;
   Artwork: TPortableNetworkGraphic;
 begin
+  Report(EventText);
   PlayAlertSound(Sound);
   if Picture = '' then Exit;
   ClearScreens;
@@ -548,18 +551,18 @@ begin
   ApiLabel.Font.Color := TColor(11068803);
   if Red then Status.Caption := 'Повітряна тривога'
   else Status.Caption := 'Тривоги немає';
-  if Red <> AlarmActive then Report(Status.Caption);
   if Red and not AlarmActive then
   begin
-    Notify('ALERT_SOUND_ALARM', 'ALERT_IMAGE_WARNING');
+    Notify('ALERT_SOUND_ALARM', 'ALERT_IMAGE_WARNING', 'Повітряна тривога');
     LastReminder := NowMS;
   end
   else if Red and (NowMS - LastReminder >= 1800000) then
   begin
-    Notify('ALERT_SOUND_REMINDER', '');
+    Notify('ALERT_SOUND_REMINDER', '', 'Нагадування: повітряна тривога триває');
     LastReminder := NowMS;
   end
-  else if AlarmActive and not Red then Notify('ALERT_SOUND_CLEAR', 'ALERT_IMAGE_CLEAR');
+  else if AlarmActive and not Red then
+    Notify('ALERT_SOUND_CLEAR', 'ALERT_IMAGE_CLEAR', 'Відбій повітряної тривоги');
   AlarmActive := Red;
 end;
 
@@ -592,6 +595,17 @@ begin
   NextCheck := GetTickCount64;
 end;
 
+procedure TfMainForm.ShowAbout;
+var Dialog: TfAbout;
+begin
+  Dialog := TfAbout.Create(Self);
+  try
+    Dialog.ShowModal;
+  finally
+    Dialog.Free;
+  end;
+end;
+
 procedure TfMainForm.CommandClick(Sender: TObject);
 begin
   case TMenuItem(Sender).Tag of
@@ -607,9 +621,9 @@ begin
          else Start;
        end;
     2: Request('regions');
-    3: Notify('ALERT_SOUND_ALARM', 'ALERT_IMAGE_WARNING');
-    4: Notify('ALERT_SOUND_REMINDER', '');
-    5: Notify('ALERT_SOUND_CLEAR', 'ALERT_IMAGE_CLEAR');
+    3: Notify('ALERT_SOUND_ALARM', 'ALERT_IMAGE_WARNING', 'Тест: сирена');
+    4: Notify('ALERT_SOUND_REMINDER', '', 'Тест: нагадування');
+    5: Notify('ALERT_SOUND_CLEAR', 'ALERT_IMAGE_CLEAR', 'Тест: відбій');
     6: begin
          TrayOpen(Sender);
          if not Assigned(Job) then
@@ -621,6 +635,7 @@ begin
        end;
     8: TrayOpen(Sender);
     10: EditSettings;
+    11: ShowAbout;
     9: begin
          EventLog.Show;
          EventLog.BringToFront;
@@ -640,7 +655,12 @@ begin
   P.X := 0;
   P.Y := GearButton.Height;
   P := GearButton.ClientToScreen(P);
-  SettingsMenu.PopUp(P.X, P.Y);
+  OpenItem.Enabled := False;
+  try
+    SettingsMenu.PopUp(P.X, P.Y);
+  finally
+    OpenItem.Enabled := True;
+  end;
 end;
 
 procedure TfMainForm.TrayOpen(Sender: TObject);

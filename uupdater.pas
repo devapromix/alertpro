@@ -7,7 +7,7 @@ interface
 uses Classes, SysUtils;
 
 const
-  AlertProVersion = '8.0.0';
+  AlertProVersion = '8.1.0';
   UpdateRepository = 'devapromix/alertpro';
 
 type

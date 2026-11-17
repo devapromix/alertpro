@@ -93,18 +93,17 @@ object fMainForm: TfMainForm
     OnTimer = Tick
   end
   object SettingsMenu: TPopupMenu
+    Left = 152
+    Top = 32
     object OpenItem: TMenuItem
       Tag = 8
-      Caption = 'Відкрити панель'
+      Caption = 'Відкрити'
       OnClick = CommandClick
     end
     object LogItem: TMenuItem
       Tag = 9
       Caption = 'Журнал подій'
       OnClick = CommandClick
-    end
-    object MainSeparator: TMenuItem
-      Caption = '-'
     end
     object StartItem: TMenuItem
       Tag = 1
@@ -119,11 +118,6 @@ object fMainForm: TfMainForm
     object DiagnosticItem: TMenuItem
       Tag = 6
       Caption = 'Перевірити АПІ'
-      OnClick = CommandClick
-    end
-    object SettingsItem: TMenuItem
-      Tag = 10
-      Caption = 'Налаштування…'
       OnClick = CommandClick
     end
     object TestSeparator: TMenuItem
@@ -147,6 +141,19 @@ object fMainForm: TfMainForm
     object ExitSeparator: TMenuItem
       Caption = '-'
     end
+    object SettingsItem: TMenuItem
+      Tag = 10
+      Caption = 'Налаштування…'
+      OnClick = CommandClick
+    end
+    object AboutItem: TMenuItem
+      Tag = 11
+      Caption = 'Про програму'
+      OnClick = CommandClick
+    end
+    object MainSeparator: TMenuItem
+      Caption = '-'
+    end
     object ExitItem: TMenuItem
       Caption = 'Вихід'
       OnClick = CommandClick
@@ -155,5 +162,7 @@ object fMainForm: TfMainForm
   object TrayIcon: TTrayIcon
     PopUpMenu = SettingsMenu
     OnDblClick = TrayOpen
+    Left = 224
+    Top = 32
   end
 end
